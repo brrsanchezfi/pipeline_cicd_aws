@@ -1,0 +1,65 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: CRUD API Configuration
+
+Resources:
+  MyDynamoDBTable:
+    Type: 'AWS::DynamoDB::Table'
+    Properties:
+      TableName: table-1
+      AttributeDefinitions:
+        - AttributeName: ID 
+          AttributeType: S
+      KeySchema:
+        - AttributeName: ID
+          KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+
+
+  # Define cada función Lambda en la carpeta "src"
+  Get1Function:
+    Type: 'AWS::Lambda::Function'
+    Properties:
+      Handler: src/get.lambda_handler
+      Role: arn:aws:iam::YOUR_ROLE_ARN
+      FunctionName: Get1Function
+      Code:
+        S3Bucket: your-bucket
+        S3Key: get1.zip
+      Runtime: python3.8
+      Timeout: 30
+
+
+  MyApiGateway:
+    Type: 'AWS::ApiGateway::RestApi'
+    Properties:
+      Name: MyApi  # Reemplaza con el nombre de tu API
+
+  PostResource:
+    Type: 'AWS::ApiGateway::Resource'
+    Properties:
+      RestApiId:
+        Fn::Ref: MyApiGateway
+      ParentId:
+        Fn::GetAtt:
+          - MyApiGateway
+          - RootResourceId
+      PathPart: post
+
+  PostMethod:
+    Type: 'AWS::ApiGateway::Method'
+    Properties:
+      AuthorizationType: NONE
+      HttpMethod: POST
+      ResourceId:
+        Fn::GetAtt:
+          - PostResource
+          - ID
+      RestApiId:
+        Fn::Ref: MyApiGateway
+      Integration:
+        IntegrationHttpMethod: POST
+        Type: AWS_PROXY
+        Uri:
+          Fn::Sub: arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/${PostFunction.Arn}/invocations

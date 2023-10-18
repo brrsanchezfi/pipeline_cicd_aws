@@ -4,6 +4,7 @@ import boto3
 dynamodb = boto3.client('dynamodb')
 
 def lambda_handler(event, context):
+
     table_name = 'NombreDeTuTabla'
     
     response = dynamodb.scan(
