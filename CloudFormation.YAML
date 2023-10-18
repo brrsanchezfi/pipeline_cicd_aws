@@ -22,7 +22,7 @@ Resources:
     Type: 'AWS::Lambda::Function'
     Properties:
       Handler: src/get.lambda_handler
-      Role: arn:aws:iam::AWSCodePipelineServiceRole-us-east-1-brrsanchezfi
+      Role: arn:aws:iam::575259683139:role/service-role/AWSCodePipelineServiceRole-us-east-1-brrsanchezfi
       FunctionName: Get1Function
       Code:
         S3Bucket: your-bucket
